@@ -11,11 +11,19 @@ import (
 
 type User = user.User
 
+var parsedUsers []User
+
 func GetUsers() (users []User) {
-	return ParseUsers()
+	if len(parsedUsers) == 0 {
+		ParseUsers()
+	}
+
+	return parsedUsers
 }
 
-func ParseUsers() (users []User) {
+func ParseUsers() {
+	parsedUsers = nil
+
 	f, err := os.Open("/etc/passwd")
 	if err != nil {
 		fmt.Errorf("%v", err)
@@ -23,7 +31,6 @@ func ParseUsers() (users []User) {
 
 	defer f.Close()
 
-	var usersSlice []User
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		user, err := parseLine(scanner.Text())
@@ -31,10 +38,8 @@ func ParseUsers() (users []User) {
 			fmt.Errorf("%v", err)
 		}
 
-		usersSlice = append(usersSlice, user)
+		parsedUsers = append(parsedUsers, user)
 	}
-
-	return usersSlice
 }
 
 func parseLine(line string) (user.User, error) {
