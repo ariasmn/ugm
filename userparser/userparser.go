@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type User = user.User
+type User user.User
 
 var parsedUsers []User
 
@@ -42,17 +42,17 @@ func ParseUsers() {
 	}
 }
 
-func parseLine(line string) (user.User, error) {
+func parseLine(line string) (User, error) {
 	fs := strings.Split(line, ":")
 
 	if len(fs) != 7 {
-		return user.User{}, errors.New("unexpected number of fields in /etc/passwd")
+		return User{}, errors.New("unexpected number of fields in /etc/passwd")
 	}
 
 	//Parse the GECOS field
 	gecos := strings.Split(fs[4], ",")
 
-	return user.User{
+	return User{
 		Uid: fs[2],
 		Gid: fs[3],
 		Username: fs[0],
