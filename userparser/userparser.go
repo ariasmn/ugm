@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type User user.User
+type User = user.User
 
 var parsedUsers []User
 
