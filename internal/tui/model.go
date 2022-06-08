@@ -24,7 +24,7 @@ func InitialModel() BubbleUser {
 func userToItem(users []userparser.User) []list.Item {
 	items := make([]list.Item, len(users))
 	for i,v := range users {
-		items[i] = item{Uid: v.Uid, Gid: v.Gid, Username: v.Username, HomeDir: v.HomeDir}
+		items[i] = item(v)
 	}
 
 	return items
