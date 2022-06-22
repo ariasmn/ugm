@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/ariasmn/ugm/userparser"
 	"github.com/charmbracelet/bubbles/list"
 )
@@ -8,7 +10,7 @@ import (
 type item userparser.User
 
 func (i item) Title() string       { return i.Username }
-func (i item) Description() string { return i.HomeDir }
+func (i item) Description() string { return fmt.Sprintf("UID: %s, GID: %s", i.Uid, i.Gid) }
 func (i item) FilterValue() string { return i.Username }
 
 type BubbleUser struct {

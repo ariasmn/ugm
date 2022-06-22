@@ -57,5 +57,6 @@ func parseLine(line string) (User, error) {
 		Gid: fs[3],
 		Username: fs[0],
 		Name: gecos[0],
-		HomeDir: fs[5]}, nil
+		HomeDir: fs[5],
+	}, nil
 }
