@@ -5,6 +5,7 @@ import (
 
 	"github.com/ariasmn/ugm/userparser"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/viewport"
 )
 
 type item userparser.User
@@ -15,12 +16,16 @@ func (i item) FilterValue() string { return i.Username }
 
 type BubbleUser struct {
 	list list.Model
+	viewport viewport.Model
 }
 
 func InitialModel() BubbleUser {
 	items := userToItem(userparser.GetUsers())
-	
-	return BubbleUser{list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	l.Title = "Users"
+	l.SetShowHelp(false)
+
+	return BubbleUser{list: l}
 }
 
 func userToItem(users []userparser.User) []list.Item {
