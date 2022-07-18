@@ -2,13 +2,17 @@ package tui
 
 import (
 	"fmt"
+	"os/user"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/evertras/bubble-table/table"
 	"github.com/muesli/reflow/wordwrap"
 )
 
 func (bu BubbleUser) listView() string {
+	bu.list.Styles.Title = listColorStyle
+
 	return listStyle.Render(bu.list.View())
 }
 
@@ -29,16 +33,35 @@ func (bu BubbleUser) detailView() string {
 
 		builder.WriteString(divider)
 
-		builder.WriteString("Member of: \n")
-		for _, group := range it.(item).Groups {
-			builder.WriteString(fmt.Sprintf("GID: %s --- Name: %s\n", group.Gid, group.Name))
-		}
+		builder.WriteString("Member of groups: \n")
+		builder.WriteString(renderGroupTable(it.(item).Groups).View())
 
 	}
-	
 	details := wordwrap.String(builder.String(), bu.viewport.Width)
 
 	return detailStyle.Render(details)
+}
+
+func renderGroupTable(groups []*user.Group) table.Model {
+
+	rows := []table.Row{}
+
+	for _, group := range groups {
+		rows = append(rows, table.NewRow(table.RowData{
+			"GID": group.Gid,
+			"Name": group.Name,
+		}))
+	}
+
+	groupsTable := table.New([]table.Column{
+		table.NewColumn("GID", "GID", 10),
+		table.NewColumn("Name", "Name", 16),
+	}).WithRows(rows).
+		BorderRounded().
+		WithBaseStyle(tableMainStyle).
+		HeaderStyle(tableHeaderStyle)
+
+	return groupsTable
 }
 
 func (bu BubbleUser) View() string {
