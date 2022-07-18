@@ -67,16 +67,11 @@ func parseLine(line string) (User, error) {
 }
 
 func parseGroups(currentUser user.User) ([]*user.Group) {
-	groupsIds, err:= currentUser.GroupIds()
-	if err != nil {
-		fmt.Errorf("%v", err)
-	}
-
+	groupsIds, _:= currentUser.GroupIds()
 	groups := []*user.Group{}
 
 	for _, groupId := range groupsIds {
 		foundGroup, _ := user.LookupGroupId(groupId)
-
 		groups = append(groups, foundGroup)
 	}
 
