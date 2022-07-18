@@ -10,6 +10,6 @@ func TestGetUsers(t *testing.T) {
 	got := GetUsers()
 
 	if reflect.TypeOf(got) != reflect.TypeOf(want) {
-        t.Errorf("got %q, wanted %q", got, want)
+        t.Errorf("got %q, wanted %q", reflect.TypeOf(got), reflect.TypeOf(want))
     }
 }
