@@ -10,6 +10,11 @@ var (
 		Border(lipgloss.RoundedBorder(), false, true, false, false)
 	listColorStyle = lipgloss.NewStyle().
 		Background(lipgloss.Color("#3d719c"))
+	itemStyle = lipgloss.NewStyle().
+		PaddingLeft(4)
+	selectedItemStyle = lipgloss.NewStyle().
+		PaddingLeft(2).
+		Foreground(lipgloss.Color("#569cd6"))
 	detailStyle = lipgloss.NewStyle().
 		PaddingTop(2)
 	dividerStyle = lipgloss.NewStyle().
