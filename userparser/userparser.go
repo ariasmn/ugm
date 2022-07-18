@@ -9,7 +9,10 @@ import (
 	"strings"
 )
 
-type User = user.User
+type User struct {
+	Details user.User
+	Groups []*user.Group
+}
 
 var parsedUsers []User
 
@@ -52,11 +55,30 @@ func parseLine(line string) (User, error) {
 	//Parse the GECOS field
 	gecos := strings.Split(fs[4], ",")
 
-	return User{
-		Uid: fs[2],
-		Gid: fs[3],
-		Username: fs[0],
-		Name: gecos[0],
-		HomeDir: fs[5],
-	}, nil
+	user := User{}
+	user.Details.Uid = fs[2]
+	user.Details.Gid = fs[3]
+	user.Details.Username = fs[0]
+	user.Details.Name = gecos[0]
+	user.Details.HomeDir = fs[5]
+	user.Groups = parseGroups(user.Details)
+
+	return user, nil
+}
+
+func parseGroups(currentUser user.User) ([]*user.Group) {
+	groupsIds, err:= currentUser.GroupIds()
+	if err != nil {
+		fmt.Errorf("%v", err)
+	}
+
+	groups := []*user.Group{}
+
+	for _, groupId := range groupsIds {
+		foundGroup, _ := user.LookupGroupId(groupId)
+
+		groups = append(groups, foundGroup)
+	}
+
+	return groups
 }

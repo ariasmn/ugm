@@ -10,9 +10,9 @@ import (
 
 type item userparser.User
 
-func (i item) Title() string       { return i.Username }
-func (i item) Description() string { return fmt.Sprintf("UID: %s, GID: %s", i.Uid, i.Gid) }
-func (i item) FilterValue() string { return i.Username }
+func (i item) Title() string       { return i.Details.Username }
+func (i item) Description() string { return fmt.Sprintf("UID: %s, GID: %s", i.Details.Uid, i.Details.Gid) }
+func (i item) FilterValue() string { return i.Details.Username }
 
 type BubbleUser struct {
 	list list.Model
