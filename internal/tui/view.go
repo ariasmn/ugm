@@ -10,6 +10,13 @@ import (
 	"github.com/muesli/reflow/wordwrap"
 )
 
+func (bu BubbleUser) View() string {
+	bu.viewport.SetContent(bu.detailView())
+
+	return lipgloss.JoinHorizontal(
+		lipgloss.Top, bu.listView(), bu.viewport.View())
+}
+
 func (bu BubbleUser) listView() string {
 	bu.list.Styles.Title = listColorStyle
 
@@ -18,14 +25,18 @@ func (bu BubbleUser) listView() string {
 
 func (bu BubbleUser) detailView() string {
 	builder := &strings.Builder{}
+
 	divider := dividerStyle.Render(strings.Repeat("-", bu.viewport.Width)) + "\n"
+	detailsHeader := headerStyle.Render("Details")
+	memberOfHeader := headerStyle.Render("Member of")
 
 	if it := bu.list.SelectedItem(); it != nil {
-		username := fmt.Sprintf("Username: %s\n", it.(item).Details.Username)
+		username := fmt.Sprintf("\n\nUsername: %s\n", it.(item).Details.Username)
 		fullname := fmt.Sprintf("Fullname: %s\n", it.(item).Details.Name)
-		identificators := fmt.Sprintf("UID: %s, GID: %s\n", it.(item).Details.Uid, it.(item).Details.Gid)
+		identificators := fmt.Sprintf("UID: %s\nGID: %s\n", it.(item).Details.Uid, it.(item).Details.Gid)
 		homeDirectory := fmt.Sprintf("Home directory: %s\n", it.(item).Details.HomeDir)
 
+		builder.WriteString(detailsHeader)
 		builder.WriteString(username)
 		builder.WriteString(fullname)
 		builder.WriteString(identificators)
@@ -33,8 +44,8 @@ func (bu BubbleUser) detailView() string {
 
 		builder.WriteString(divider)
 
-		builder.WriteString("Member of groups: \n")
-		builder.WriteString(renderGroupTable(it.(item).Groups).View())
+		builder.WriteString(memberOfHeader)
+		builder.WriteString(fmt.Sprintf("\n\n%s", renderGroupTable(it.(item).Groups).View()))
 
 	}
 	details := wordwrap.String(builder.String(), bu.viewport.Width)
@@ -43,7 +54,6 @@ func (bu BubbleUser) detailView() string {
 }
 
 func renderGroupTable(groups []*user.Group) table.Model {
-
 	rows := []table.Row{}
 
 	for _, group := range groups {
@@ -62,11 +72,4 @@ func renderGroupTable(groups []*user.Group) table.Model {
 		HeaderStyle(tableHeaderStyle)
 
 	return groupsTable
-}
-
-func (bu BubbleUser) View() string {
-	bu.viewport.SetContent(bu.detailView())
-
-	return lipgloss.JoinHorizontal(
-		lipgloss.Top, bu.listView(), bu.viewport.View())
 }

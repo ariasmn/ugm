@@ -22,9 +22,9 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	line := user.Details.Username
 
 	if index == m.Index() {
-		line = selectedItemStyle.Render("> " + line)
+		line = listSelectedlistItemStyle.Render("> " + line)
 	} else {
-		line = itemStyle.Render(line)
+		line = listItemStyle.Render(line)
 	}
 
 	fmt.Fprint(w, line)
