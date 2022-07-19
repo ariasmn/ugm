@@ -1,10 +1,11 @@
-package tui
+package user
 
 import (
 	"fmt"
 	"io"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/ariasmn/ugm/internal/tui/common"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -22,9 +23,9 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	line := user.Details.Username
 
 	if index == m.Index() {
-		line = listSelectedlistItemStyle.Render("> " + line)
+		line = common.ListSelectedListItemStyle.Render("> " + line)
 	} else {
-		line = listItemStyle.Render(line)
+		line = common.ListItemStyle.Render(line)
 	}
 
 	fmt.Fprint(w, line)

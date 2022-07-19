@@ -1,11 +1,11 @@
-package tui
+package user
 
 import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (bu BubbleUser) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (bu BubbleUser) Update(msg tea.Msg) (BubbleUser, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
@@ -19,5 +19,6 @@ func (bu BubbleUser) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
 	bu.list, cmd = bu.list.Update(msg)
+	
 	return bu, cmd
 }

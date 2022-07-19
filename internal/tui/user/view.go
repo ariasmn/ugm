@@ -1,10 +1,11 @@
-package tui
+package user
 
 import (
 	"fmt"
 	"os/user"
 	"strings"
 
+	"github.com/ariasmn/ugm/internal/tui/common"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
 	"github.com/muesli/reflow/wordwrap"
@@ -18,16 +19,16 @@ func (bu BubbleUser) View() string {
 }
 
 func (bu BubbleUser) listView() string {
-	bu.list.Styles.Title = listColorStyle
+	bu.list.Styles.Title = common.ListColorStyle
 
-	return listStyle.Render(bu.list.View())
+	return common.ListStyle.Render(bu.list.View())
 }
 
 func (bu BubbleUser) detailView() string {
 	builder := &strings.Builder{}
-	divider := dividerStyle.Render(strings.Repeat("-", bu.viewport.Width)) + "\n"
-	detailsHeader := headerStyle.Render("Details")
-	memberOfHeader := headerStyle.Render("Member of")
+	divider := common.DividerStyle.Render(strings.Repeat("-", bu.viewport.Width)) + "\n"
+	detailsHeader := common.HeaderStyle.Render("Details")
+	memberOfHeader := common.HeaderStyle.Render("Member of")
 
 	if it := bu.list.SelectedItem(); it != nil {
 		builder.WriteString(detailsHeader)
@@ -38,7 +39,7 @@ func (bu BubbleUser) detailView() string {
 	}
 	details := wordwrap.String(builder.String(), bu.viewport.Width)
 
-	return detailStyle.Render(details)
+	return common.DetailStyle.Render(details)
 }
 
 func renderGroupTable(groups []*user.Group) table.Model {
@@ -56,8 +57,8 @@ func renderGroupTable(groups []*user.Group) table.Model {
 		table.NewColumn("Name", "Name", 16),
 	}).WithRows(rows).
 		BorderRounded().
-		WithBaseStyle(tableMainStyle).
-		HeaderStyle(tableHeaderStyle)
+		WithBaseStyle(common.TableMainStyle).
+		HeaderStyle(common.TableHeaderStyle)
 
 	return groupsTable
 }

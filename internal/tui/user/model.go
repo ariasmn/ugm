@@ -1,4 +1,4 @@
-package tui
+package user
 
 import (
 	"github.com/ariasmn/ugm/userparser"
