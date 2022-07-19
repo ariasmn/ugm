@@ -35,20 +35,29 @@ func (bu BubbleUser) detailView() string {
 		builder.WriteString(renderUserDetails(it.(item).Details))
 		builder.WriteString(divider)
 		builder.WriteString(memberOfHeader)
-		builder.WriteString(fmt.Sprintf("\n\n%s", renderGroupTable(it.(item).Groups).View()))
+		builder.WriteString(fmt.Sprintf("\n\n%s", renderGroupTable(it.(item).Groups)))
 	}
 	details := wordwrap.String(builder.String(), bu.viewport.Width)
 
 	return common.DetailStyle.Render(details)
 }
 
-func renderGroupTable(groups []*user.Group) table.Model {
+func renderUserDetails(user user.User) string {
+	username := fmt.Sprintf("\n\nUsername: %s\n", user.Username)
+	fullname := fmt.Sprintf("Fullname: %s\n", user.Name)
+	identificators := fmt.Sprintf("UID: %s\nGID: %s\n", user.Uid, user.Gid)
+	homeDirectory := fmt.Sprintf("Home directory: %s\n", user.HomeDir)
+	
+	return username+fullname+identificators+homeDirectory
+}
+
+func renderGroupTable(groups []*user.Group) string {
 	rows := []table.Row{}
 
 	for _, group := range groups {
 		rows = append(rows, table.NewRow(table.RowData{
-			"GID": group.Gid,
-			"Name": group.Name,
+			"GID"	: group.Gid,
+			"Name"	: group.Name,
 		}))
 	}
 
@@ -60,14 +69,5 @@ func renderGroupTable(groups []*user.Group) table.Model {
 		WithBaseStyle(common.TableMainStyle).
 		HeaderStyle(common.TableHeaderStyle)
 
-	return groupsTable
-}
-
-func renderUserDetails(user user.User) string {
-	username := fmt.Sprintf("\n\nUsername: %s\n", user.Username)
-	fullname := fmt.Sprintf("Fullname: %s\n", user.Name)
-	identificators := fmt.Sprintf("UID: %s\nGID: %s\n", user.Uid, user.Gid)
-	homeDirectory := fmt.Sprintf("Home directory: %s\n", user.HomeDir)
-	
-	return username+fullname+identificators+homeDirectory
+	return groupsTable.View()
 }

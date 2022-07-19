@@ -7,10 +7,6 @@ import (
 
 func (bu BubbleUser) Update(msg tea.Msg) (BubbleUser, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		if msg.String() == "ctrl+c" {
-			return bu, tea.Quit
-		}
 	case tea.WindowSizeMsg:
 		bu.list.SetSize(msg.Width, msg.Height)
 		bu.viewport = viewport.New(msg.Width, msg.Height)
