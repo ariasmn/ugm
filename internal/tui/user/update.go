@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/ariasmn/ugm/internal/tui/common"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -8,7 +9,8 @@ import (
 func (bu BubbleUser) Update(msg tea.Msg) (BubbleUser, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		bu.list.SetSize(msg.Width, msg.Height)
+		h, v := common.ListStyle.GetFrameSize()
+		bu.list.SetSize(msg.Width-h, msg.Height-v)
 		bu.viewport = viewport.New(msg.Width, msg.Height)
 		bu.viewport.SetContent(bu.detailView())
 	}

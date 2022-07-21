@@ -7,7 +7,7 @@ var (
 		Width(35).
 		PaddingRight(3).
 		MarginRight(3).
-		Border(lipgloss.RoundedBorder(), false, true, false, false)
+		Border(lipgloss.RoundedBorder())
 	ListColorStyle = lipgloss.NewStyle().
 		Background(lipgloss.Color("#3d719c"))
 	ListItemStyle = lipgloss.NewStyle().
