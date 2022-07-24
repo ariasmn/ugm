@@ -1,3 +1,5 @@
+// +build linux freebsd openbsd netbsd
+
 package userparser
 
 import (
