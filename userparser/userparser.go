@@ -1,3 +1,4 @@
+//go:build linux || freebsd || openbsd || netbsd
 // +build linux freebsd openbsd netbsd
 
 package userparser
@@ -13,7 +14,7 @@ import (
 
 type User struct {
 	Details user.User
-	Groups []*user.Group
+	Groups  []*user.Group
 }
 
 var parsedUsers []User
@@ -68,8 +69,8 @@ func parseLine(line string) (User, error) {
 	return user, nil
 }
 
-func parseGroups(currentUser user.User) ([]*user.Group) {
-	groupsIds, _:= currentUser.GroupIds()
+func parseGroups(currentUser user.User) []*user.Group {
+	groupsIds, _ := currentUser.GroupIds()
 	groups := []*user.Group{}
 
 	for _, groupId := range groupsIds {

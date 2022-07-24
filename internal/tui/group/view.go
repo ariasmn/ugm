@@ -48,7 +48,7 @@ func renderGroupDetails(group user.Group) string {
 	gid := fmt.Sprintf("\n\nGID: %s\n", group.Gid)
 	name := fmt.Sprintf("Name: %s\n", group.Name)
 
-	return gid+name
+	return gid + name
 }
 
 func renderUserTable(users []*user.User) string {
@@ -59,11 +59,11 @@ func renderUserTable(users []*user.User) string {
 			return "No users in this group"
 		}
 		rows = append(rows, table.NewRow(table.RowData{
-			"Username"			: user.Username,
-			"Fullname"			: user.Name,
-			"UID"				: user.Uid,
-			"GID"				: user.Gid,
-			"Home directory"	: user.HomeDir,
+			"Username":       user.Username,
+			"Fullname":       user.Name,
+			"UID":            user.Uid,
+			"GID":            user.Gid,
+			"Home directory": user.HomeDir,
 		}))
 	}
 

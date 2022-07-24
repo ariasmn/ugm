@@ -20,6 +20,6 @@ func (bu BubbleUser) Update(msg tea.Msg) (BubbleUser, tea.Cmd) {
 
 	var cmd tea.Cmd
 	bu.list, cmd = bu.list.Update(msg)
-	
+
 	return bu, cmd
 }

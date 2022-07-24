@@ -10,10 +10,10 @@ import (
 )
 
 var supportedOS = map[string]bool{
-	"linux": true,
+	"linux":   true,
 	"freebsd": true,
 	"openbsd": true,
-	"netbsd": true,
+	"netbsd":  true,
 }
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	p := tea.NewProgram(tui.InitialModel(), tea.WithAltScreen())
-	
+
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

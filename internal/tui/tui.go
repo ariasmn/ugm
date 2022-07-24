@@ -14,9 +14,9 @@ const (
 )
 
 type model struct {
-	state state
-	bu user.BubbleUser
-	bg group.BubbleGroup
+	state         state
+	bu            user.BubbleUser
+	bg            group.BubbleGroup
 	width, height int
 }
 
@@ -63,16 +63,16 @@ func (m model) View() string {
 
 func InitialModel() model {
 	return model{
-		state: showUserView, 
-		bu: user.InitialModel(),
-		bg: group.InitialModel(),
+		state: showUserView,
+		bu:    user.InitialModel(),
+		bg:    group.InitialModel(),
 	}
 }
 
 func updateByState(m model) (model, tea.Cmd) {
 	var cmd tea.Cmd
-	windowSizeMsg := tea.WindowSizeMsg {
-		Width: m.width,
+	windowSizeMsg := tea.WindowSizeMsg{
+		Width:  m.width,
 		Height: m.height,
 	}
 

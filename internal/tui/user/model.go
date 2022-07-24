@@ -11,7 +11,7 @@ type item userparser.User
 func (i item) FilterValue() string { return i.Details.Username }
 
 type BubbleUser struct {
-	list list.Model
+	list     list.Model
 	viewport viewport.Model
 }
 
@@ -26,7 +26,7 @@ func InitialModel() BubbleUser {
 
 func userToItem(users []userparser.User) []list.Item {
 	items := make([]list.Item, len(users))
-	for i,v := range users {
+	for i, v := range users {
 		items[i] = item(v)
 	}
 

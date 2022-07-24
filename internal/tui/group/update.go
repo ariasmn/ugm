@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func (bg BubbleGroup) Update (msg tea.Msg) (BubbleGroup, tea.Cmd) {
+func (bg BubbleGroup) Update(msg tea.Msg) (BubbleGroup, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		horizontal, vertical := common.ListStyle.GetFrameSize()

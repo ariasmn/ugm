@@ -49,8 +49,8 @@ func renderUserDetails(user user.User) string {
 	fullname := fmt.Sprintf("Fullname: %s\n", user.Name)
 	identificators := fmt.Sprintf("UID: %s\nGID: %s\n", user.Uid, user.Gid)
 	homeDirectory := fmt.Sprintf("Home directory: %s\n", user.HomeDir)
-	
-	return username+fullname+identificators+homeDirectory
+
+	return username + fullname + identificators + homeDirectory
 }
 
 func renderGroupTable(groups []*user.Group) string {
@@ -58,8 +58,8 @@ func renderGroupTable(groups []*user.Group) string {
 
 	for _, group := range groups {
 		rows = append(rows, table.NewRow(table.RowData{
-			"GID"	: group.Gid,
-			"Name"	: group.Name,
+			"GID":  group.Gid,
+			"Name": group.Name,
 		}))
 	}
 
