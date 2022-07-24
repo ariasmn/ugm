@@ -5,6 +5,7 @@ import "github.com/charmbracelet/lipgloss"
 var (
 	ListStyle = lipgloss.NewStyle().
 		Width(35).
+		MarginTop(1).
 		PaddingRight(3).
 		MarginRight(3).
 		Border(lipgloss.RoundedBorder())

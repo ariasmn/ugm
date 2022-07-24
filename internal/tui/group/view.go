@@ -20,6 +20,8 @@ func (bg BubbleGroup) View() string {
 
 func (bg BubbleGroup) listView() string {
 	bg.list.Styles.Title = common.ListColorStyle
+	bg.list.Styles.FilterPrompt.Foreground(common.ListColorStyle.GetBackground())
+	bg.list.Styles.FilterCursor.Foreground(common.ListColorStyle.GetBackground())
 
 	return common.ListStyle.Render(bg.list.View())
 }

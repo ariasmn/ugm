@@ -20,6 +20,8 @@ func (bu BubbleUser) View() string {
 
 func (bu BubbleUser) listView() string {
 	bu.list.Styles.Title = common.ListColorStyle
+	bu.list.Styles.FilterPrompt.Foreground(common.ListColorStyle.GetBackground())
+	bu.list.Styles.FilterCursor.Foreground(common.ListColorStyle.GetBackground())
 
 	return common.ListStyle.Render(bu.list.View())
 }
