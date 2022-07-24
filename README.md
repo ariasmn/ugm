@@ -22,16 +22,16 @@ or download from [releases](https://github.com/ariasmn/ugm/releases).
 
 To launch the tool, run the `ugm` command.
 
-| KeyBoard          | Description                           |
-| :------:          | :------------------------------------:|
-|  Ctrl+c / q /Esc  | Exit                                  |
-|  Tab              | Switch between user and group view    |
-|    ↑ / k          | Previous item                         |
-|    ↓ / j          | Next item                             |
-|    ← / h          | Previous page                         |
-|    → / l          | Next page                             |
-|    /              | Enter search keywords                 |
-|  Enter            | Apply search                          |
+| KeyBoard              | Description                           |
+| :------:              | :------------------------------------:|
+|  Ctrl+c / q / Esc     | Exit                                  |
+|  Tab                  | Switch between user and group view    |
+|    ↑ / k              | Previous item                         |
+|    ↓ / j              | Next item                             |
+|    ← / h              | Previous page                         |
+|    → / l              | Next page                             |
+|    /                  | Enter search keywords                 |
+|  Enter                | Apply search                          |
 
 
 ## Notes
