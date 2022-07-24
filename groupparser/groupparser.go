@@ -3,7 +3,7 @@ package groupparser
 import (
 	"bufio"
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"os/user"
 	"strings"
@@ -29,7 +29,7 @@ func parseGroups() {
 
 	f, err := os.Open("/etc/group")
 	if err != nil {
-		fmt.Errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	defer f.Close()
@@ -38,7 +38,7 @@ func parseGroups() {
 	for scanner.Scan() {
 		group, err := parseLine(scanner.Text())
 		if err != nil {
-			fmt.Errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		parsedGroups = append(parsedGroups, group)

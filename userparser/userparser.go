@@ -3,7 +3,7 @@ package userparser
 import (
 	"bufio"
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"os/user"
 	"strings"
@@ -29,7 +29,7 @@ func ParseUsers() {
 
 	f, err := os.Open("/etc/passwd")
 	if err != nil {
-		fmt.Errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	defer f.Close()
@@ -38,7 +38,7 @@ func ParseUsers() {
 	for scanner.Scan() {
 		user, err := parseLine(scanner.Text())
 		if err != nil {
-			fmt.Errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		parsedUsers = append(parsedUsers, user)
