@@ -21,16 +21,16 @@ var parsedUsers []User
 
 func GetUsers() (users []User) {
 	if len(parsedUsers) == 0 {
-		ParseUsers()
+		ParseUsers("/etc/passwd")
 	}
 
 	return parsedUsers
 }
 
-func ParseUsers() {
+func ParseUsers(path string) {
 	parsedUsers = nil
 
-	f, err := os.Open("/etc/passwd")
+	f, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}

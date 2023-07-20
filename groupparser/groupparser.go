@@ -21,16 +21,16 @@ var parsedGroups []Group
 
 func GetGroups() (groups []Group) {
 	if len(parsedGroups) == 0 {
-		parseGroups()
+		ParseGroups("/etc/group")
 	}
 
 	return parsedGroups
 }
 
-func parseGroups() {
+func ParseGroups(path string) {
 	parsedGroups = nil
 
-	f, err := os.Open("/etc/group")
+	f, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
