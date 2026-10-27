@@ -36,9 +36,7 @@ To launch the tool, run the `ugm` command.
 
 ## Notes
 
-`ugm` only works on UNIX based OS.
-
-On OSX, the information reported will not be accurate. The tool relies on the `/etc/passwd` and `/etc/group` files, which are only consulted in OSX in single-user mode, and the system uses [DirectoryService](https://developer.apple.com/documentation/devicemanagement/directoryservice) to manage user and groups.
+`ugm` currently supports Linux, FreeBSD, OpenBSD, and NetBSD only. Although macOS is UNIX-based, it is not supported: the account parser and release targets exclude Darwin. macOS uses [Directory Services](https://developer.apple.com/documentation/devicemanagement/directoryservice) to manage users and groups, so `/etc/passwd` and `/etc/group` are not an authoritative account source there.
 
 ## Built with
  - [bubbletea](https://github.com/charmbracelet/bubbletea) and its ecosystem
