@@ -57,10 +57,17 @@ func renderGroupTable(groups []*user.Group) string {
 	rows := []table.Row{}
 
 	for _, group := range groups {
+		if group == nil {
+			continue
+		}
 		rows = append(rows, table.NewRow(table.RowData{
 			"GID":  group.Gid,
 			"Name": group.Name,
 		}))
+	}
+
+	if len(rows) == 0 {
+		return "No resolvable group details available"
 	}
 
 	groupsTable := table.New([]table.Column{
