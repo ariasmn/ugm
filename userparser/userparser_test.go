@@ -10,62 +10,131 @@ import (
 	"testing"
 )
 
-const mockPwd = `test:x:0:0:test:/test:/bin/test
-mock:x:1:65537:mock:/mock:/sbin/mock
-`
-
 func TestGetUsers(t *testing.T) {
-	tempDir, _ := os.CreateTemp("", "passwd")
-	err := os.WriteFile(tempDir.Name(), []byte(mockPwd), 0644)
+	rootGroup, err := user.LookupGroupId("0")
 	if err != nil {
-		t.Fatalf("Should not have failed: %s", err)
+		t.Fatalf("Could not look up root group: %v", err)
 	}
-	defer os.Remove(tempDir.Name())
 
-	ParseUsers(tempDir.Name()) // We parse the temp file before getting the users
-	got := GetUsers()
-	want := getWanted()
-
-	for userIndex, _ := range got {
-		if got[userIndex].Details.Uid != want[userIndex].Details.Uid {
-			t.Errorf("Got UID %s, wanted %s", got[userIndex].Details.Uid, want[userIndex].Details.Uid)
-		}
-		if got[userIndex].Details.Gid != want[userIndex].Details.Gid {
-			t.Errorf("Got GID %s, wanted %s", got[userIndex].Details.Gid, want[userIndex].Details.Gid)
-		}
-		if got[userIndex].Details.Username != want[userIndex].Details.Username {
-			t.Errorf("Got username %s, wanted %s", got[userIndex].Details.Username, want[userIndex].Details.Username)
-		}
-		if got[userIndex].Details.Name != want[userIndex].Details.Name {
-			t.Errorf("Got name %s, wanted %s", got[userIndex].Details.Name, want[userIndex].Details.Name)
-		}
-		if got[userIndex].Details.HomeDir != want[userIndex].Details.HomeDir {
-			t.Errorf("Got homedir %s, wanted %s", got[userIndex].Details.HomeDir, want[userIndex].Details.HomeDir)
-		}
-		if !reflect.DeepEqual(got[userIndex].Groups, want[userIndex].Groups) {
-			t.Errorf("Got group %v, wanted %v", got[userIndex].Groups, want[userIndex].Groups)
-		}
+	tests := []struct {
+		name   string
+		passwd string
+		want   []User
+	}{
+		{
+			name:   "resolves primary group",
+			passwd: "ugm-test-user:x:1000:0:ugm Test User:/home/ugm-test-user:/bin/sh\n",
+			want: []User{
+				{
+					Details: user.User{
+						Uid:      "1000",
+						Gid:      "0",
+						Username: "ugm-test-user",
+						Name:     "ugm Test User",
+						HomeDir:  "/home/ugm-test-user",
+					},
+					Groups: []user.Group{*rootGroup},
+				},
+			},
+		},
+		{
+			name:   "keeps unresolved group",
+			passwd: "ugm-test-user:x:1000:65537:ugm Test User:/home/ugm-test-user:/bin/sh\n",
+			want: []User{
+				{
+					Details: user.User{
+						Uid:      "1000",
+						Gid:      "65537",
+						Username: "ugm-test-user",
+						Name:     "ugm Test User",
+						HomeDir:  "/home/ugm-test-user",
+					},
+					Groups: []user.Group{{Gid: "65537"}},
+				},
+			},
+		},
+		{
+			name:   "falls back to primary group when group IDs cannot be listed",
+			passwd: ":x:1000:0:No Username:/home/no-username:/bin/sh\n",
+			want: []User{
+				{
+					Details: user.User{
+						Uid:      "1000",
+						Gid:      "0",
+						Username: "",
+						Name:     "No Username",
+						HomeDir:  "/home/no-username",
+					},
+					Groups: []user.Group{*rootGroup},
+				},
+			},
+		},
+		{
+			name:   "skips empty group ID",
+			passwd: "no-groups:x:1000::No Groups:/home/no-groups:/bin/sh\n",
+			want: []User{
+				{
+					Details: user.User{
+						Uid:      "1000",
+						Gid:      "",
+						Username: "no-groups",
+						Name:     "No Groups",
+						HomeDir:  "/home/no-groups",
+					},
+					Groups: []user.Group{},
+				},
+			},
+		},
+		{
+			name: "parses multiple users",
+			passwd: "resolved:x:1000:0:Resolved User:/home/resolved:/bin/sh\n" +
+				"unresolved:x:1001:65537:Unresolved User:/home/unresolved:/bin/sh\n",
+			want: []User{
+				{
+					Details: user.User{
+						Uid:      "1000",
+						Gid:      "0",
+						Username: "resolved",
+						Name:     "Resolved User",
+						HomeDir:  "/home/resolved",
+					},
+					Groups: []user.Group{*rootGroup},
+				},
+				{
+					Details: user.User{
+						Uid:      "1001",
+						Gid:      "65537",
+						Username: "unresolved",
+						Name:     "Unresolved User",
+						HomeDir:  "/home/unresolved",
+					},
+					Groups: []user.Group{{Gid: "65537"}},
+				},
+			},
+		},
 	}
-}
 
-func getWanted() []User {
-	userTest := User{}
-	rootGroup, _ := user.LookupGroupId("0")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tempFile, err := os.CreateTemp("", "passwd")
+			if err != nil {
+				t.Fatalf("Could not create temp file: %v", err)
+			}
+			defer os.Remove(tempFile.Name())
 
-	userTest.Details.Uid = "0"
-	userTest.Details.Gid = "0"
-	userTest.Details.Username = "test"
-	userTest.Details.Name = "test"
-	userTest.Details.HomeDir = "/test"
-	userTest.Groups = append(userTest.Groups, rootGroup)
+			if _, err := tempFile.WriteString(tt.passwd); err != nil {
+				t.Fatalf("Could not write temp file: %v", err)
+			}
+			if err := tempFile.Close(); err != nil {
+				t.Fatalf("Could not close temp file: %v", err)
+			}
 
-	userMock := User{}
-	userMock.Details.Uid = "1"
-	userMock.Details.Gid = "65537"
-	userMock.Details.Username = "mock"
-	userMock.Details.Name = "mock"
-	userMock.Details.HomeDir = "/mock"
-	userMock.Groups = []*user.Group{nil}
+			parseUsers(tempFile.Name())
+			got := GetUsers()
 
-	return []User{userTest, userMock}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetUsers() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
 }

@@ -14,20 +14,20 @@ import (
 
 type Group struct {
 	Details user.Group
-	Users   []*user.User
+	Users   []user.User
 }
 
 var parsedGroups []Group
 
 func GetGroups() (groups []Group) {
 	if len(parsedGroups) == 0 {
-		ParseGroups("/etc/group")
+		parseGroups("/etc/group")
 	}
 
 	return parsedGroups
 }
 
-func ParseGroups(path string) {
+func parseGroups(path string) {
 	parsedGroups = nil
 
 	f, err := os.Open(path)
@@ -63,13 +63,23 @@ func parseLine(line string) (Group, error) {
 	return group, nil
 }
 
-func parseUsers(groupUsernames string) []*user.User {
+func parseUsers(groupUsernames string) []user.User {
 	usernames := strings.Split(groupUsernames, ",")
-	users := []*user.User{}
+	users := make([]user.User, 0, len(usernames))
 
 	for _, username := range usernames {
-		foundUser, _ := user.Lookup(username)
-		users = append(users, foundUser)
+		if username == "" {
+			continue
+		}
+
+		foundUser, err := user.Lookup(username)
+		if err != nil {
+			// Keep membership with username and empty details.
+			users = append(users, user.User{Username: username})
+			continue
+		}
+
+		users = append(users, *foundUser)
 	}
 
 	return users
