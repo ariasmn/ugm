@@ -14,20 +14,20 @@ import (
 
 type User struct {
 	Details user.User
-	Groups  []*user.Group
+	Groups  []user.Group
 }
 
 var parsedUsers []User
 
 func GetUsers() (users []User) {
 	if len(parsedUsers) == 0 {
-		ParseUsers("/etc/passwd")
+		parseUsers("/etc/passwd")
 	}
 
 	return parsedUsers
 }
 
-func ParseUsers(path string) {
+func parseUsers(path string) {
 	parsedUsers = nil
 
 	f, err := os.Open(path)
@@ -69,13 +69,30 @@ func parseLine(line string) (User, error) {
 	return user, nil
 }
 
-func parseGroups(currentUser user.User) []*user.Group {
-	groupsIds, _ := currentUser.GroupIds()
-	groups := []*user.Group{}
+func parseGroups(currentUser user.User) []user.Group {
+	groupIDs, err := currentUser.GroupIds()
+	if err != nil {
+		// The primary group is always known from /etc/passwd, so keep it even
+		// if the supplementary groups cannot be resolved.
+		groupIDs = []string{currentUser.Gid}
+	}
 
-	for _, groupId := range groupsIds {
-		foundGroup, _ := user.LookupGroupId(groupId)
-		groups = append(groups, foundGroup)
+	groups := make([]user.Group, 0, len(groupIDs))
+
+	for _, groupID := range groupIDs {
+		if groupID == "" {
+			continue
+		}
+
+		foundGroup, err := user.LookupGroupId(groupID)
+		if err != nil {
+			// Keep the GID with an empty name instead of dropping the
+			// membership.
+			groups = append(groups, user.Group{Gid: groupID})
+			continue
+		}
+
+		groups = append(groups, *foundGroup)
 	}
 
 	return groups

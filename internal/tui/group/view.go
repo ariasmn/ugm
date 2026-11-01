@@ -51,13 +51,14 @@ func renderGroupDetails(group user.Group) string {
 	return gid + name
 }
 
-func renderUserTable(users []*user.User) string {
+func renderUserTable(users []user.User) string {
+	if len(users) == 0 {
+		return "No users in this group"
+	}
+
 	rows := []table.Row{}
 
 	for _, user := range users {
-		if user == nil {
-			return "No users in this group"
-		}
 		rows = append(rows, table.NewRow(table.RowData{
 			"Username":       user.Username,
 			"Fullname":       user.Name,

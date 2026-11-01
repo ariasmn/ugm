@@ -4,53 +4,115 @@
 package groupparser
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 	"reflect"
 	"testing"
 )
 
-const mockGroup = `test:x:0:
-mock:x:65537:
-`
-
 func TestGetGroups(t *testing.T) {
-	tempDir, _ := os.CreateTemp("", "group")
-	err := os.WriteFile(tempDir.Name(), []byte(mockGroup), 0644)
+	currentUser, err := user.Current()
 	if err != nil {
-		t.Fatalf("Should not have failed: %s", err)
+		t.Fatalf("Could not look up current user: %v", err)
 	}
-	defer os.Remove(tempDir.Name())
 
-	ParseGroups(tempDir.Name())
-	got := GetGroups()
-	want := getWanted()
-
-	for groupIndex, _ := range got {
-		if got[groupIndex].Details.Gid != want[groupIndex].Details.Gid {
-			t.Errorf("Got GID %s, wanted %s", got[groupIndex].Details.Gid, want[groupIndex].Details.Gid)
-		}
-		if got[groupIndex].Details.Name != want[groupIndex].Details.Name {
-			t.Errorf("Got name %s, wanted %s", got[groupIndex].Details.Name, want[groupIndex].Details.Name)
-		}
-		if !reflect.DeepEqual(got[groupIndex].Users, want[groupIndex].Users) {
-			t.Errorf("Got users %v, wanted %v", got[groupIndex].Users, want[groupIndex].Users)
-		}
+	tests := []struct {
+		name  string
+		group string
+		want  []Group
+	}{
+		{
+			name:  "empty member list",
+			group: "empty:x:1000:\n",
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1000", Name: "empty"},
+					Users:   []user.User{},
+				},
+			},
+		},
+		{
+			name:  "resolves member",
+			group: fmt.Sprintf("resolved:x:1001:%s\n", currentUser.Username),
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1001", Name: "resolved"},
+					Users:   []user.User{*currentUser},
+				},
+			},
+		},
+		{
+			name:  "keeps unresolved member",
+			group: "unresolved:x:1002:ugm-test-unresolved-user\n",
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1002", Name: "unresolved"},
+					Users:   []user.User{{Username: "ugm-test-unresolved-user"}},
+				},
+			},
+		},
+		{
+			name:  "keeps mixed resolved and unresolved members",
+			group: fmt.Sprintf("mixed:x:1003:%s,ugm-test-unresolved-user\n", currentUser.Username),
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1003", Name: "mixed"},
+					Users: []user.User{
+						*currentUser,
+						{Username: "ugm-test-unresolved-user"},
+					},
+				},
+			},
+		},
+		{
+			name:  "skips empty member entries",
+			group: fmt.Sprintf("empty-entries:x:1004:,%s,\n", currentUser.Username),
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1004", Name: "empty-entries"},
+					Users:   []user.User{*currentUser},
+				},
+			},
+		},
+		{
+			name: "parses multiple groups",
+			group: "first:x:1005:\n" +
+				"second:x:1006:ugm-test-unresolved-user\n",
+			want: []Group{
+				{
+					Details: user.Group{Gid: "1005", Name: "first"},
+					Users:   []user.User{},
+				},
+				{
+					Details: user.Group{Gid: "1006", Name: "second"},
+					Users:   []user.User{{Username: "ugm-test-unresolved-user"}},
+				},
+			},
+		},
 	}
-}
 
-func getWanted() []Group {
-	testGroup := Group{}
-	testGroup.Details.Gid = "0"
-	testGroup.Details.Name = "test"
-	testGroup.Users = []*user.User{nil}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tempFile, err := os.CreateTemp("", "group")
+			if err != nil {
+				t.Fatalf("Could not create temp file: %v", err)
+			}
+			defer os.Remove(tempFile.Name())
 
-	mockGroup := Group{}
-	mockGroup.Details.Gid = "65537"
-	mockGroup.Details.Name = "mock"
-	mockGroup.Users = []*user.User{nil}
+			if _, err := tempFile.WriteString(tt.group); err != nil {
+				t.Fatalf("Could not write temp file: %v", err)
+			}
+			if err := tempFile.Close(); err != nil {
+				t.Fatalf("Could not close temp file: %v", err)
+			}
 
-	// Hard to test the users inside the group, since we use the Golang's lookup method
-	// This method tries to find an user within the system, so is quite hard to mock and not worth the hassle
-	return []Group{testGroup, mockGroup}
+			parseGroups(tempFile.Name())
+			got := GetGroups()
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetGroups() = %#v, want %#v", got, tt.want)
+			}
+		})
+	}
 }
